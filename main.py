@@ -1,6 +1,3 @@
-import cv2
-import argparse
-
 # UDP running on a thread
 import threading
 import socket
@@ -24,6 +21,8 @@ listen_UDP.start()
 
 # Model and OpenCV starts
 
+import cv2
+import argparse
 from ultralytics import YOLO
 import supervision as sv
 import numpy as np
