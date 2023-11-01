@@ -43,6 +43,9 @@ import math
 from sort import *
 import argparse
 import numpy as np
+# For making requests to backend server
+import asyncio
+import requests
 
 # Loading Model Name from .env & Initializing Model
 print('Using Model:', MODEL_NAME)
@@ -171,6 +174,7 @@ def upload_file():
                 nparr = np.fromstring(filestr, np.uint8)
                 img = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
                 results = model(img, stream=True)
+                boxCount = 0
                 for r in results:
                     boxes = r.boxes
                     for box in boxes:
@@ -191,7 +195,7 @@ def upload_file():
                         # print(currentClass)
 
                         if conf > useConf:
-
+                            boxCount += 1
                             # cvzone.putTextRect(img, f'{classNames[cls]} {conf}',
                                             #   (max(0, x1), max(35, y1-10)), scale=2, thickness=2,colorB=myColor,
                                             #   colorT=(255,255,255),colorR=myColor, offset=5)
@@ -200,10 +204,15 @@ def upload_file():
                             # detections = np.vstack((detections, currentArray))
                 cv2.imwrite(app.root_path + "/static_detect/" + filename, img)
                 print('Write Success:', app.root_path + "/static_detect/" + filename)
+
+                # Call the backend endpoint to save data into backend
+
+
+
             except Exception as e:
                 return handle_error(e)
             
-            return {"pothole":"true"}
+            return {"pothole":boxCount > 0}
             
     return '''
     <!doctype html>
