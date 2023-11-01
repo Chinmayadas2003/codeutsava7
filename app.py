@@ -160,7 +160,7 @@ def upload_file():
                             cv2.rectangle(img, (x1, y1), (x2, y2), myColor, 2)
                             # currentArray = np.array([x1, y1, x2, y2, conf])
                             # detections = np.vstack((detections, currentArray))
-                cv2.imwrite("static_detect/"+filename, img)
+                cv2.imwrite(os.path.join(app.root_path, "/static_detect", filename, img))
                 print('Write Success:', "static_detect/"+filename)
             except Exception as e:
                 return handle_error(e)
