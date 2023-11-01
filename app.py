@@ -1,8 +1,5 @@
-# .env Configuration Loading
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+# Import Settings
+from appSettings import *
 
 def handle_error(e):
     print(e)
@@ -16,7 +13,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
 # MongoDB Settings - URL
-uri = os.getenv('MONGODB_URI')
+uri = MONGODB_URI
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 db = 0
@@ -44,13 +41,11 @@ import math
 from sort import *
 import argparse
 import numpy as np
-from appSettings import classNames, myColor, my_map, useCuda
 
 # Loading Model Name from .env & Initializing Model
-modelName = os.getenv('MODEL_NAME')
-print('Using Model:', modelName)
+print('Using Model:', MODEL_NAME)
 
-model = YOLO(modelName)
+model = YOLO(MODEL_NAME)
 if useCuda:
     model.to('cuda')
 
@@ -152,7 +147,7 @@ def upload_file():
                         currentClass = classNames[cls]
                         # print(currentClass)
 
-                        if conf>0.25:
+                        if conf > useConf:
 
                             # cvzone.putTextRect(img, f'{classNames[cls]} {conf}',
                                             #   (max(0, x1), max(35, y1-10)), scale=2, thickness=2,colorB=myColor,

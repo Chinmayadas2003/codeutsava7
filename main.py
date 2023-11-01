@@ -1,3 +1,6 @@
+# Import Settings
+from appSettings import *
+
 # UDP running on a thread
 import threading
 import socket
@@ -30,7 +33,6 @@ from sort import *
 import argparse
 import numpy as np
 import time
-from appSettings import classNames, my_map, myColor, useCuda
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Live")
@@ -42,11 +44,11 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "--model",
-        default=["yolov8m.pt"],
+        default=["potholev1.pt"],
         nargs=1
     )
     parser.add_argument(
-        "--rtmp",
+        "--src",
         default=[0],
         nargs=1
     )
