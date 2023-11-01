@@ -20,6 +20,11 @@ def parse_arguments() -> argparse.Namespace:
         nargs=2, 
         type=int
     )
+    parser.add_argument(
+        "--rtmp",
+        default=0,
+        nargs=1
+    )
     args = parser.parse_args()
     return args
 
@@ -27,8 +32,11 @@ def parse_arguments() -> argparse.Namespace:
 def main():
     args = parse_arguments()
     frame_width, frame_height = args.webcam_resolution
-    
-    cap = cv2.VideoCapture(0)
+    rtmpSource = args.rtmp[0]
+
+    print("RTMP Arg", rtmpSource)
+
+    cap = cv2.VideoCapture(rtmpSource)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     
@@ -53,21 +61,21 @@ def main():
     while True:
         ret, frame = cap.read()
 
-        result = model(frame, agnostic_nms=True)[0]
-        detections = sv.Detections.from_yolov8(result)
-        labels = [
-            f"{model.model.names[class_id]} {confidence:0.2f}"
-            for _, confidence, class_id, _
-            in detections
-        ]
-        frame = box_annotator.annotate(
-            scene=frame, 
-            detections=detections, 
-            labels=labels
-        )
+        # result = model(frame, agnostic_nms=True)[0]
+        # detections = sv.Detections.from_yolov8(result)
+        # labels = [
+        #     f"{model.model.names[class_id]} {confidence:0.2f}"
+        #     for _, confidence, class_id, _
+        #     in detections
+        # ]
+        # frame = box_annotator.annotate(
+        #     scene=frame, 
+        #     detections=detections, 
+        #     labels=labels
+        # )
 
-        zone.trigger(detections=detections)
-        frame = zone_annotator.annotate(scene=frame)      
+        # zone.trigger(detections=detections)
+        # frame = zone_annotator.annotate(scene=frame)      
         
         cv2.imshow("Real Time Pothole Detection on Stream", frame)
 
