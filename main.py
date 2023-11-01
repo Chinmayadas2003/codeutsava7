@@ -30,6 +30,7 @@ from sort import *
 import argparse
 import numpy as np
 import time
+from appSettings import classNames, my_map, myColor, useCuda
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Live")
@@ -77,17 +78,18 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     
     model = YOLO(modelName)
-    model.to('cuda')
+    if useCuda:
+        model.to('cuda')
 
     tracker = Sort(max_age=20, min_hits=0, iou_threshold=0.3)
 
-    classNames = [
-        'Pothole'
-    ]
+    # classNames = [
+    #     'Pothole'
+    # ]
 
-    myColor = (255, 0, 0)
+    # myColor = (255, 0, 0)
 
-    my_map = {3: 1,}
+    # my_map = {3: 1,}
 
     while True:
         success, img = cap.read()

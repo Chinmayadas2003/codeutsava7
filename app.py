@@ -44,13 +44,15 @@ import math
 from sort import *
 import argparse
 import numpy as np
+from appSettings import classNames, myColor, my_map, useCuda
 
 # Loading Model Name from .env & Initializing Model
 modelName = os.getenv('MODEL_NAME')
 print('Using Model:', modelName)
 
 model = YOLO(modelName)
-model.to('cuda')
+if useCuda:
+    model.to('cuda')
 
 
 # Flask Imports
@@ -122,19 +124,47 @@ def upload_file():
                 print("Longitude:", request.form['lon'])
             except Exception as e:
                 return handle_error(e)
-            # Save the image and also process it as OpenCV Frame
+            
+            # Run Inference and save output
             try:
                 # file.save(os.path.join(uploads, filename))
                 filestr = request.files['file'].read()
                 # file_bytes = np.fromstring(filestr, np.uint8)
                 nparr = np.fromstring(filestr, np.uint8)
-                frame = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
-                result = model(frame, stream=True)
-                for r in result:
-                    print("Inference Result:", r.boxes)
-                
+                img = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
+                results = model(img, stream=True)
+                for r in results:
+                    boxes = r.boxes
+                    for box in boxes:
+                        # Bounding Box
+                        x1, y1, x2, y2 = box.xyxy[0]
+                        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+                        # cv2.rectangle(img,(x1,y1),(x2,y2),(255,0,255),3)
+                        w, h = x2 - x1, y2 - y1
+                        # cvzone.cornerRect(img, (x1, y1, w, h))
+
+                        # Confidence
+                        conf = math.ceil((box.conf[0] * 100)) / 100
+
+                        # Class Name
+                        cls = int(box.cls[0])
+                        currentClass = classNames[cls]
+                        # print(currentClass)
+
+                        if conf>0.25:
+
+                            # cvzone.putTextRect(img, f'{classNames[cls]} {conf}',
+                                            #   (max(0, x1), max(35, y1-10)), scale=2, thickness=2,colorB=myColor,
+                                            #   colorT=(255,255,255),colorR=myColor, offset=5)
+                            cv2.rectangle(img, (x1, y1), (x2, y2), myColor, 2)
+                            # currentArray = np.array([x1, y1, x2, y2, conf])
+                            # detections = np.vstack((detections, currentArray))
+                cv2.imwrite("static_detect/"+filename, img)
+                print('Write Success:', "static_detect/"+filename)
             except Exception as e:
                 return handle_error(e)
+            
             return {"pothole":"true"}
             
     return '''
