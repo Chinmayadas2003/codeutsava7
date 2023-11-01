@@ -1,8 +1,6 @@
 # GeoJSON Imports
 from geojson import Point
 
-
-
 # MongoDB Imports
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -88,6 +86,11 @@ def upload_file():
             filename = secure_filename(file.filename)
             uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
             file.save(os.path.join(uploads, filename))
+
+            # This contains the data sent from frontend
+            print("Latitude:", request.form['lat'])
+            print("Longitude:", request.form['lon'])
+            
             return "Upload Successfull!"
     return '''
     <!doctype html>
