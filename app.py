@@ -1,3 +1,13 @@
+# .env Configuration Loading
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def handle_error(e):
+    print(e)
+    return "Error!"
+
 # GeoJSON Imports
 from geojson import Point
 
@@ -6,7 +16,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
 # MongoDB Settings - URL
-uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+uri = os.getenv('MONGODB_URI')
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 db = 0
@@ -20,8 +30,7 @@ try:
     db = client.codeutsava
 
 except Exception as e:
-    print(e)
-    exit(1)
+    handle_error()
 
 # Flask Imports
 
@@ -85,12 +94,18 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
-            file.save(os.path.join(uploads, filename))
+            try:
+                file.save(os.path.join(uploads, filename))
+            except Exception as e:
+                return handle_error(e)
 
             # This contains the data sent from frontend
-            print("Latitude:", request.form['lat'])
-            print("Longitude:", request.form['lon'])
-            
+            try:
+                print("Latitude:", request.form['lat'])
+                print("Longitude:", request.form['lon'])
+            except Exception as e:
+                return handle_error(e)
+
             return "Upload Successfull!"
     return '''
     <!doctype html>
@@ -101,5 +116,3 @@ def upload_file():
       <input type=submit value=Upload>
     </form>
     '''
-
-
