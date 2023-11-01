@@ -1,6 +1,29 @@
 import cv2
 import argparse
 
+# UDP running on a thread
+import threading
+import socket
+
+# Creating the socket
+
+data = 'Nothing received'
+UDP_ADDR = '0.0.0.0'
+UDP_PORT = 31337
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind((UDP_ADDR, UDP_PORT))
+
+def rec_UDP():
+    while True:
+        data, addr = sock.recvfrom(4096)
+        print("Echoing " + data.decode('utf-8') + " back to " + str(addr))
+
+# The thread that ables the listen for UDP packets is loaded
+listen_UDP = threading.Thread(target=rec_UDP)
+listen_UDP.start()
+
+# Model and OpenCV starts
+
 from ultralytics import YOLO
 import supervision as sv
 import numpy as np
@@ -22,12 +45,12 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "--model",
-        default="yolov8m.pt",
+        default=["yolov8m.pt"],
         nargs=1
     )
     parser.add_argument(
         "--rtmp",
-        default=0,
+        default=[0],
         nargs=1
     )
     args = parser.parse_args()
@@ -67,7 +90,7 @@ def main():
     while True:
         ret, frame = cap.read()
 
-        result = model(frame, agnostic_nms=True)[0]
+        # result = model(frame, agnostic_nms=True)[0]
         # detections = sv.Detections.from_yolov8(result)
         # labels = [
         #     f"{model.model.names[class_id]} {confidence:0.2f}"
@@ -83,7 +106,7 @@ def main():
         # zone.trigger(detections=detections)
         # frame = zone_annotator.annotate(scene=frame)      
         
-        print(result)
+        # print(result)
         cv2.imshow("Real Time Pothole Detection on Stream", frame)
 
         if (cv2.waitKey(30) == 27):
