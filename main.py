@@ -21,6 +21,11 @@ def parse_arguments() -> argparse.Namespace:
         type=int
     )
     parser.add_argument(
+        "--model",
+        default="yolov8m.pt",
+        nargs=1
+    )
+    parser.add_argument(
         "--rtmp",
         default=0,
         nargs=1
@@ -33,6 +38,7 @@ def main():
     args = parse_arguments()
     frame_width, frame_height = args.webcam_resolution
     rtmpSource = args.rtmp[0]
+    modelName = args.model[0]
 
     print("RTMP Arg", rtmpSource)
 
@@ -40,7 +46,7 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     
-    model = YOLO("yolov8m.pt")
+    model = YOLO(modelName)
 
     box_annotator = sv.BoxAnnotator(
         thickness=2,
@@ -61,7 +67,7 @@ def main():
     while True:
         ret, frame = cap.read()
 
-        # result = model(frame, agnostic_nms=True)[0]
+        result = model(frame, agnostic_nms=True)[0]
         # detections = sv.Detections.from_yolov8(result)
         # labels = [
         #     f"{model.model.names[class_id]} {confidence:0.2f}"
@@ -77,6 +83,7 @@ def main():
         # zone.trigger(detections=detections)
         # frame = zone_annotator.annotate(scene=frame)      
         
+        print(result)
         cv2.imshow("Real Time Pothole Detection on Stream", frame)
 
         if (cv2.waitKey(30) == 27):
