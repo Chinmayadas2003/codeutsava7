@@ -11,6 +11,8 @@ from geojson import Point
 # MongoDB Imports
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from bson import json_util
+import json
 
 # MongoDB Settings - URL
 uri = MONGODB_URI
@@ -85,9 +87,50 @@ def allowed_file(filename):
 def index():
     return "Server is live!"
 
+
+# Get and Post for pothole data
+def parse_json(data):
+    return json.loads(json_util.dumps(data))
+
 @app.route("/potholes", methods=["GET"])
-def send_pothole_data():
-    pass
+def get_pothole_data():
+    try:
+        client.admin.command('ping')
+        readCursor = db.potholes.find({})
+        return parse_json(readCursor)
+    except Exception as e:
+        handle_error(e)
+
+@app.route("/potholes", methods=["POST"])
+def insert_pothole_data():
+    try:
+        # Lat Lon Mandatory
+        lat = request.form['lat']
+        lon = request.form['lon']
+
+        # Use Image Name if present
+        imgName = getTimestamp()
+        if imgName in request.form:
+            imgName = request.form['imgName']
+        # Use Area if present
+        area = -1
+        if area in request.form:
+            area = request.form['area']
+        
+        writeCursor = db.potholes.insert_one({
+            "lat": lat,
+            "lon": lon,
+            "imgName": imgName,
+            "area": area,
+            "repaired": False,
+            "insertTS": getTimestamp(),
+            "repairTS": -1
+        })
+
+        print("DB Insert:", str(writeCursor.inserted_id))
+        return "Success"
+    except Exception as e:
+        handle_error(e)
 
 # Handle File Upload and Download
 
