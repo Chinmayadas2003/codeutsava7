@@ -87,12 +87,12 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     
     model = YOLO(modelName)
+    model.to('cuda')
+
     tracker = Sort(max_age=20, min_hits=0, iou_threshold=0.3)
 
     classNames = [
-        'Drain Hole',
-        'Pothole',
-        'Sewer Cover'
+        'Pothole'
     ]
 
     myColor = (255, 0, 0)
