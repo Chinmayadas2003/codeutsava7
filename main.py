@@ -31,14 +31,6 @@ import argparse
 import numpy as np
 import time
 
-
-ZONE_POLYGON = np.array([
-    [0, 0],
-    [0.5, 0],
-    [0.5, 1],
-    [0, 1]
-])
-
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Live")
     parser.add_argument(
@@ -71,8 +63,6 @@ def convert_to_grayscale(image):
     # Convert the image to grayscale
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return gray_image
-
-
 
 def main():
     args = parse_arguments()
