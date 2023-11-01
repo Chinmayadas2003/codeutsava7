@@ -161,8 +161,10 @@ def upload_file():
             uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
             # This contains the data sent from frontend
             try:
-                print("Latitude:", request.form['lat'])
-                print("Longitude:", request.form['lon'])
+                lat = request.form['lat']
+                lon = request.form['lon']
+                print("Latitude:", lat)
+                print("Longitude:", lon)
             except Exception as e:
                 return handle_error(e)
             
@@ -208,12 +210,13 @@ def upload_file():
                 # Call the backend endpoint to save data into backend
 
 
-
             except Exception as e:
                 return handle_error(e)
             
-            return {"pothole":boxCount > 0}
-            
+            if boxCount > 0:
+                return {"pothole":"true"}
+            else:
+                return {"pothole":"false"}
     return '''
     <!doctype html>
     <title>Upload new File</title>
@@ -224,12 +227,17 @@ def upload_file():
     </form>
     '''
 
+# Function call to make network requests
+async def writeData(lat, lon, imgName, area):
+    loop = asyncio.get_event_loop()
+    
+
+
 # Image Filters
 def denoise_image(image):
     # Apply Non-Local Means Denoising
     denoised_image = cv2.fastNlMeansDenoising(image, None, h=10, searchWindowSize=21, templateWindowSize=7)
     return denoised_image
-
 
 def convert_to_grayscale(image):
     # Convert the image to grayscale
