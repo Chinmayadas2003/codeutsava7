@@ -15,35 +15,6 @@ from geojson import Point
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-# Model Imports
-import pandas as pd
-import cv2
-import numpy as np
-from ultralytics import YOLO
-import cv2
-import cvzone
-import math
-from sort import *
-import argparse
-import numpy as np
-
-# Parsing Arguments & Initializing Model
-def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Live")
-    parser.add_argument(
-        "--model",
-        default=["yolov8m.pt"],
-        nargs=1
-    )
-    args = parser.parse_args()
-    return args
-
-args = parse_arguments()
-modelName = args.model[0]
-
-model = YOLO(modelName)
-model.to('cuda')
-
 # MongoDB Settings - URL
 uri = os.getenv('MONGODB_URI')
 client = MongoClient(uri, server_api=ServerApi('1'))
@@ -59,7 +30,28 @@ try:
     db = client.codeutsava
 
 except Exception as e:
-    handle_error()
+    handle_error(e)
+
+
+# Model Imports
+import pandas as pd
+import cv2
+import numpy as np
+from ultralytics import YOLO
+import cv2
+import cvzone
+import math
+from sort import *
+import argparse
+import numpy as np
+
+# Loading Model Name from .env & Initializing Model
+modelName = os.getenv('MODEL_NAME')
+print('Using Model:', modelName)
+
+model = YOLO(modelName)
+model.to('cuda')
+
 
 # Flask Imports
 
@@ -137,8 +129,9 @@ def upload_file():
                 # file_bytes = np.fromstring(filestr, np.uint8)
                 nparr = np.fromstring(filestr, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
-                result = model(frame, stream=True)[0]
-                print("Inference Result:", result)
+                result = model(frame, stream=True)
+                for r in result:
+                    print("Inference Result:", r.boxes)
                 
             except Exception as e:
                 return handle_error(e)
