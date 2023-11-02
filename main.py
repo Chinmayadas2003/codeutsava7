@@ -70,7 +70,7 @@ def convert_to_grayscale(image):
 def main():
     args = parse_arguments()
     frame_width, frame_height = args.webcam_resolution
-    rtmpSource = args.rtmp[0]
+    rtmpSource = args.src[0]
     modelName = args.model[0]
 
     print("RTMP Arg", rtmpSource)
@@ -93,6 +93,7 @@ def main():
 
     # my_map = {3: 1,}
 
+    lastBoxCount = 0
     while True:
         success, img = cap.read()
         if success:
@@ -101,6 +102,8 @@ def main():
             results = model(img, stream=True)
             # result = model(frame, agnostic_nms=True)[0]
             # print(result)
+
+            boxCount = 0
 
             for r in results:
                 boxes = r.boxes
@@ -122,7 +125,6 @@ def main():
                     print(currentClass)
 
                     if conf>0.25:
-
                         #cvzone.putTextRect(img, f'{classNames[cls]} {conf}',
                         #                   (max(0, x1), max(35, y1-10)), scale=2, thickness=2,colorB=myColor,
                         #                   colorT=(255,255,255),colorR=myColor, offset=5)
@@ -134,6 +136,7 @@ def main():
             resultsTracker = tracker.update(detections)
 
             for result in resultsTracker:
+                boxCount += 1
                 loop_count = 1
                 x1, y1, x2, y2, id = result
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
@@ -169,10 +172,12 @@ def main():
                     #     winsound.Beep(frequency, duration)
 
                     # This block will call the backend api
-                    print('Pothole Detected, Backend API Call')
-
-
+                    pass
+            if boxCount > lastBoxCount:
+                print('Pothole Detected, Backend API Call')
             cv2.imshow("Real Time Pothole Detection on Stream", img)
+            lastBoxCount = boxCount
+
             if (cv2.waitKey(30) == 27):
                 break
 
