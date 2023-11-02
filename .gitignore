@@ -4,5 +4,3 @@
 /imguploads/
 /static_detect/
 *.pt
-appSettings.py
-.gitignore

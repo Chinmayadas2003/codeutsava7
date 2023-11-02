@@ -95,16 +95,12 @@ def main():
 
     while True:
         success, img = cap.read()
-        lastBoxCount = 0
         if success:
-            # Box Detection Min Max Settings
-            detections = np.empty((5, 10))
+            detections = np.empty((0, 5))
 
             results = model(img, stream=True)
             # result = model(frame, agnostic_nms=True)[0]
             # print(result)
-
-            boxCount = 0
 
             for r in results:
                 boxes = r.boxes
@@ -138,11 +134,10 @@ def main():
             resultsTracker = tracker.update(detections)
 
             for result in resultsTracker:
-                boxCount += 1
                 loop_count = 1
                 x1, y1, x2, y2, id = result
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                
+                print(result)
                 w, h = x2 - x1, y2 - y1
                 #cvzone.cornerRect(img, (x1, y1, w, h), l=9, rt=2, colorR=(255, 0, 255))
                 #cvzone.putTextRect(img, f' {int(id)}', (max(0, x1), max(35, y1)),
@@ -172,20 +167,15 @@ def main():
                     #     #play(alert_sound)
                     #     loop_count -= 1
                     #     winsound.Beep(frequency, duration)
-                    pass                    
-            if boxCount > lastBoxCount:
-                # This block will call the backend api
-                print('Send Data to backend')
-                pass
+
+                    # This block will call the backend api
+                    print('Pothole Detected, Backend API Call')
+
 
             cv2.imshow("Real Time Pothole Detection on Stream", img)
-            
-            lastBoxCount = boxCount
-            
             if (cv2.waitKey(30) == 27):
                 break
-        else:
-            return
+
 
 if __name__ == "__main__":
     main()
