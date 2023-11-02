@@ -65,7 +65,7 @@ from werkzeug.utils import secure_filename
 
 
 # Image Upload Config
-UPLOAD_FOLDER = 'imguploads'
+UPLOAD_FOLDER = 'static_detect'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
