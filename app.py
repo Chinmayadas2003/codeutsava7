@@ -135,7 +135,61 @@ def insert_pothole_data():
     except Exception as e:
         handle_error(e)
 
-# Handle File Upload and Download
+
+# This route will save pothole images coming from live stream
+@app.route("/potholes_save", methods=["POST"])
+def save_pothole_from_live():
+    # Extract longitude latitute and other data
+    try:
+        # Lat Lon Mandatory
+        lat = request.form['lat']
+        lon = request.form['lon']
+        print("Latitude:", lat)
+        print("Longitude:", lon)
+
+        # Use Image Name if present
+        imgName = getTimestamp()
+        if imgName in request.form:
+            imgName = request.form['imgName']
+        # Use Area if present
+        area = -1
+        if area in request.form:
+            area = request.form['area']
+        
+        writeCursor = db.potholes.insert_one({
+            "lat": lat,
+            "lon": lon,
+            "imgName": imgName,
+            "area": area,
+            "repaired": False,
+            "insertTS": getTimestamp(),
+            "repairTS": -1
+        })
+        print("DB Insert:", str(writeCursor.inserted_id))
+    except Exception as e:
+        handle_error(e)
+
+    # Check for the file, and upload. 
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    # If the user does not select a file, the browser submits an
+    # empty file without a filename.
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = imgName
+        uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+        try:
+            file.save(os.path.join(uploads, filename))
+            return "Success!"
+        except Exception as e:
+            return handle_error(e)
+
+# Handle File Upload and Download from Android App
 
 @app.route('/uploads/<path:filename>')
 def download_file(filename):
