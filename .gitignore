@@ -3,4 +3,5 @@
 /node_modules/
 /imguploads/
 /static_detect/
+/dashboard/
 *.pt
