@@ -208,7 +208,7 @@ def upload_file():
                 print('Write Success:', app.root_path + "/static_detect/" + filename)
 
                 # Call the backend endpoint to save data into backend
-
+                writeData(lat, lon, filename, -1)
 
             except Exception as e:
                 return handle_error(e)
@@ -229,8 +229,14 @@ def upload_file():
 
 # Function call to make network requests
 async def writeData(lat, lon, imgName, area):
-    loop = asyncio.get_event_loop()
-    
+    async with requests.post('http://localhost:5000/', {
+        lat: lat,
+        lon: lon,
+        imgName: imgName,
+        area: area
+    }) as response:
+        data = await response.text()
+        print("Data recv:", data)
 
 
 # Image Filters
