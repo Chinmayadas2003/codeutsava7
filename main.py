@@ -1,5 +1,10 @@
 # Import Settings
+import requests
 from appSettings import *
+
+# Global latitude and longitude
+globalLat = -1
+globalLon = -1
 
 # UDP running on a thread
 import threading
@@ -16,6 +21,7 @@ sock.bind((UDP_ADDR, UDP_PORT))
 def rec_UDP():
     while True:
         data, addr = sock.recvfrom(4096)
+        globalLat, globalLon = data.decode('utf-8').split(',')
         print("Echoing " + data.decode('utf-8') + " back to " + str(addr))
 
 # The thread that ables the listen for UDP packets is loaded
@@ -174,13 +180,31 @@ def main():
                     # This block will call the backend api
                     pass
             if boxCount > lastBoxCount:
-                print('Pothole Detected, Backend API Call')
+                send_data_backend(img)
+                # sendDataThread = threading.Thread(target=send_data_backend, args=[img])
+                # sendDataThread.start()
+                # sendDataThread.join()
+
             cv2.imshow("Real Time Pothole Detection on Stream", img)
             lastBoxCount = boxCount
 
             if (cv2.waitKey(30) == 27):
                 break
 
+
+def send_data_backend(frame):
+    try:
+        print('Pothole Detected, Backend API Call')
+        imencoded = cv2.imencode(".jpg", frame)[1]
+        file = {'file': ('image.jpg', imencoded.tostring(), 'image/jpeg', {'Expires': '0'})}
+        data = {"lat": globalLat, "lon": globalLon}
+        response = requests.post("http://" + FLASK_SERVER + "/potholes_save", files=file, data=data, timeout=10)
+        if response.status_code == 200:
+            print('Data Sent Successfully!')
+        else:
+            print('Could not send data to server')
+    except Exception as e:
+        print(e)
 
 if __name__ == "__main__":
     main()
