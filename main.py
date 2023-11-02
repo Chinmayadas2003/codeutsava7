@@ -180,10 +180,10 @@ def main():
                     # This block will call the backend api
                     pass
             if boxCount > lastBoxCount:
-                send_data_backend(img)
-                # sendDataThread = threading.Thread(target=send_data_backend, args=[img])
-                # sendDataThread.start()
-                # sendDataThread.join()
+                # send_data_backend(img)
+                sendDataThread = threading.Thread(target=send_data_backend, args=[img])
+                sendDataThread.start()
+                sendDataThread.join()
 
             cv2.imshow("Real Time Pothole Detection on Stream", img)
             lastBoxCount = boxCount
