@@ -184,8 +184,8 @@ def save_pothole_from_live():
         filename = imgName
         uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
         try:
-            file.save(os.path.join(uploads, filename))
-            print("Live Stream Upload:", filename)
+            file.save(os.path.join(uploads, '/live', filename, '.jpg'))
+            print("Live Stream Upload:", 'live' + filename + '.jpg')
             return "Success!"
         except Exception as e:
             return handle_error(e)
