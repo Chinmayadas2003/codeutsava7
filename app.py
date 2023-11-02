@@ -135,7 +135,6 @@ def insert_pothole_data():
     except Exception as e:
         handle_error(e)
 
-
 # This route will save pothole images coming from live stream
 @app.route("/potholes_save", methods=["POST"])
 def save_pothole_from_live():
@@ -165,7 +164,7 @@ def save_pothole_from_live():
             "insertTS": getTimestamp(),
             "repairTS": -1
         })
-        print("DB Insert:", str(writeCursor.inserted_id))
+        print("Live Stream DB Insert:", str(writeCursor.inserted_id))
     except Exception as e:
         handle_error(e)
 
@@ -185,6 +184,7 @@ def save_pothole_from_live():
         uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
         try:
             file.save(os.path.join(uploads, filename))
+            print("Live Stream Upload:", filename)
             return "Success!"
         except Exception as e:
             return handle_error(e)
