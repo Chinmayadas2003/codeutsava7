@@ -144,7 +144,7 @@ def download_file(filename):
     return send_from_directory(uploads, filename)
 
 @app.route("/upload", methods=["GET", "POST"])
-async def upload_file():
+def upload_file():
     if request.method == "POST":
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -207,13 +207,13 @@ async def upload_file():
                 cv2.imwrite(app.root_path + "/static_detect/" + filename, img)
                 print('Write Success:', app.root_path + "/static_detect/" + filename)
 
-                # Call the backend endpoint to save data into backend
-                writeData(lat, lon, filename, -1)
 
             except Exception as e:
                 return handle_error(e)
             
             if boxCount > 0:
+                # Call the backend endpoint to save data into backend
+                writeData(lat, lon, filename, -1)
                 return {"pothole":"true"}
             else:
                 return {"pothole":"false"}
@@ -228,15 +228,14 @@ async def upload_file():
     '''
 
 # Function call to make network requests
-async def writeData(lat, lon, imgName, area):
-    async with requests.post('http://localhost:5000/', {
-        lat: lat,
-        lon: lon,
-        imgName: imgName,
-        area: area
-    }) as response:
-        data = await response.text()
-        print("Data recv:", data)
+def writeData(lat, lon, imgName, area):
+    req = requests.post('http://localhost:5000/potholes', data={
+        "lat": lat,
+        "lon": lon,
+        "imgName": imgName,
+        "area": area
+    })
+    print("req", req)
 
 
 # Image Filters
