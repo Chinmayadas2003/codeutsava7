@@ -3,5 +3,5 @@
 /node_modules/
 /imguploads/
 /static_detect/
-/dashboard/
+/dashboard/node_modules
 *.pt

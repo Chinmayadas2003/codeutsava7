@@ -3,8 +3,8 @@ import requests
 from appSettings import *
 
 # Global latitude and longitude
-globalLat = -1
-globalLon = -1
+globalLat = 21.249725
+globalLon = 81.6062136
 
 # UDP running on a thread
 import threading
@@ -183,7 +183,6 @@ def main():
                 # send_data_backend(img)
                 sendDataThread = threading.Thread(target=send_data_backend, args=[img])
                 sendDataThread.start()
-                sendDataThread.join()
 
             cv2.imshow("Real Time Pothole Detection on Stream", img)
             lastBoxCount = boxCount

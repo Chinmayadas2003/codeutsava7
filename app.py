@@ -115,9 +115,9 @@ def insert_pothole_data():
         lon = request.form['lon']
 
         # Use Image Name if present
-        imgName = getTimestamp() + '.jpg'
-        if imgName in request.form:
-            imgName = request.form['imgName']
+        # imgName = getTimestamp() + '.jpg'
+        # if imgName in request.form:
+        imgName = request.form['imgName']
         # Use Area if present
         area = -1
     # if area in request.form:
@@ -186,7 +186,7 @@ def save_pothole_from_live():
         filename = imgName
         uploads = app.root_path + '/' + app.config['UPLOAD_FOLDER']
         try:
-            file.save(uploads + '/live' + filename + '.jpg')
+            file.save(uploads + '/' + filename + '.jpg')
             print("Live Stream Upload:", '/live' + filename + '.jpg')
             return "Success!"
         except Exception as e:
@@ -367,13 +367,13 @@ def eliminate_potholes():
                         }
                     }
                 )
-                return {"status":"true"}
+                return {"pothole":"false"}
             else:
                 currTS = getTimestamp()
                 print("Pothole Detected")
                 cv2.imwrite(app.root_path + "/static_detect/wrong" + currTS + ".jpg", img)
                 print("File Saved:", app.root_path + "/static_detect/wrong" + currTS + ".jpg")
-                return {"status":"false"}
+                return {"pothole":"true"}
         except Exception as e:
             return handle_error(e)
 
