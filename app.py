@@ -60,6 +60,7 @@ if useCuda:
 
 import os
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, session
+from flask_cors import CORS
 from flask_session import Session
 from werkzeug.utils import secure_filename
 
@@ -69,6 +70,7 @@ UPLOAD_FOLDER = 'static_detect'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
+CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Starting flask
@@ -113,13 +115,13 @@ def insert_pothole_data():
         lon = request.form['lon']
 
         # Use Image Name if present
-        imgName = getTimestamp()
+        imgName = getTimestamp() + '.jpg'
         if imgName in request.form:
             imgName = request.form['imgName']
         # Use Area if present
         area = -1
-        if area in request.form:
-            area = request.form['area']
+    # if area in request.form:
+    #     area = request.form['area']
         
         writeCursor = db.potholes.insert_one({
             "lat": lat,
@@ -159,7 +161,7 @@ def save_pothole_from_live():
         writeCursor = db.potholes.insert_one({
             "lat": lat,
             "lon": lon,
-            "imgName": imgName,
+            "imgName": imgName + '.jpg',
             "area": area,
             "repaired": False,
             "insertTS": getTimestamp(),
@@ -212,8 +214,8 @@ def upload_file():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+            filename = getTimestamp()
+            # uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
             # This contains the data sent from frontend
             try:
                 lat = request.form['lat']
@@ -259,8 +261,8 @@ def upload_file():
                             cv2.rectangle(img, (x1, y1), (x2, y2), myColor, 2)
                             # currentArray = np.array([x1, y1, x2, y2, conf])
                             # detections = np.vstack((detections, currentArray))
-                cv2.imwrite(app.root_path + "/static_detect/" + filename, img)
-                print('Write Success:', app.root_path + "/static_detect/" + filename)
+                cv2.imwrite(app.root_path + "/static_detect/" + filename + '.jpg', img)
+                print('Write Success:', app.root_path + "/static_detect/" + filename + '.jpg')
 
 
             except Exception as e:
@@ -268,7 +270,7 @@ def upload_file():
             
             if boxCount > 0:
                 # Call the backend endpoint to save data into backend
-                writeData(lat, lon, filename, -1)
+                writeData(lat, lon, filename + '.jpg', -1)
                 return {"pothole":"true"}
             else:
                 return {"pothole":"false"}
