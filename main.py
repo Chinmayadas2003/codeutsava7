@@ -1,3 +1,6 @@
+# Import Filters
+from filters import *
+
 # Import Settings
 import requests
 from appSettings import *
@@ -62,12 +65,6 @@ def parse_arguments() -> argparse.Namespace:
     return args
 
 # Image Filters
-def denoise_image(image):
-    # Apply Non-Local Means Denoising
-    denoised_image = cv2.fastNlMeansDenoising(image, None, h=10, searchWindowSize=21, templateWindowSize=7)
-    return denoised_image
-
-
 def convert_to_grayscale(image):
     # Convert the image to grayscale
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
