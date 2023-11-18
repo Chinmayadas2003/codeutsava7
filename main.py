@@ -50,7 +50,7 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "--model",
-        default=["potholev1.pt"],
+        default=["models/potholev1.pt"],
         nargs=1
     )
     parser.add_argument(
