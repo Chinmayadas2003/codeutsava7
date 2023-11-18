@@ -82,6 +82,7 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     
+    # check cuda from pytorch library
     model = YOLO(modelName)
     if useCuda:
         model.to('cuda')
